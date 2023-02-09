@@ -1,0 +1,12 @@
+pandas
+numpy
+matplotlib
+seaborn
+sklearn
+fastapi[all]
+Flask
+pickleshare
+scipy
+six
+streamlit
+click
