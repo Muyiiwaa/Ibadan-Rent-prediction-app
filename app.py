@@ -71,8 +71,16 @@ house_type = (
     
 )
 
+display_map = {'Newly built':'newly_built_Newly_Built', 'Serviced': 'serviced_Serviced','semi_detached':'semi_detached',
+               'luxury':'luxury','pop':'pop', 'wardrobe' : 'wardrobe', 'teraced' : 'teraced', 'detached':'detached',
+               'Close to Main  Road' : 'proximity','Furished': 'furnished_Furnished'}
+selected_values = list(display_map.values())
+
 
 demo_df = pd.read_csv('demodf.csv', index_col = 0)
+
+# demo_df.rename(columns={'newly_built_Newly_Built': 'Newly Built', 'furnished_Furnished': 'furnished','serviced_Serviced': 'serviced'}, inplace=True)
+
 
 column_names = demo_df.columns
 
@@ -86,9 +94,13 @@ def predict_df(df, bedroom, bathroom, toilet, *column_names):
     # Create a new row of data with the value 0 in every column
     new_row = [0] * num_columns
     
-    # Set the value to 1 for the specified columns
+    # Set the value to 1 for the specified columns in the *columns 
     for col in column_names:
         new_row[df.columns.get_loc(col)] = 1
+     
+      # Set the value to 1 for values in the selected_values list   
+    for values in selected_values:
+        new_row[df.columns.get_loc(values)] = 1
     
     # Set the value of bedroom, bathroom, and toilet in the appropriate columns
     new_row[df.columns.get_loc('bedroom')] = bedroom
@@ -100,6 +112,8 @@ def predict_df(df, bedroom, bathroom, toilet, *column_names):
     
     return df
 
+# df.rename(columns={'old_col_name_1': 'new_col_name_1', 'old_col_name_2': 'new_col_name_2',}, inplace=True)
+
 
 def show_predict_page():
     st.title("Ibadan House Rent Prediction")
@@ -108,30 +122,39 @@ def show_predict_page():
     
     street = st.selectbox('Street', streets)
     types = st.selectbox('House_type', house_type)
-    selected_values = st.multiselect(
-        "Amenities:",
-        ['semi_detached', 'luxury', 'pop',
-        'water_heater', 'wardrobe', 
-        'teraced', 'close to main road',
-        'estate', 'detached','newly_built', 'furnished', 'serviced'],
-        default=["wardrobe"])
+    
+    selected_value = st.multiselect('Amenities:', options=list(display_map.keys()))
+    
+    
 
     bedroom = st.slider('Bedrooms', 0, 10,1)
     bathroom = st.slider('Bathrooms', 0, 10,1)
     toilet = st.slider('Toilets', 0, 10,1)
+    
+    
 
     ok = st.button("Predict Rent")
 
     if ok:
-        X = predict_df(input_data, bedroom,bathroom,toilet,types, street)
-        loaded_regressor = pickled_model
-        pred = loaded_regressor.predict(input_data)
-        pred = np.exp(pred)
+        try: 
+            X = predict_df(input_data, bedroom,bathroom,toilet,types, street)
+            loaded_regressor = pickled_model
+            pred = loaded_regressor.predict(input_data)
+            pred = np.exp(pred)
+        except (NameError, UnboundLocalError):
+            #st.subheader('One or more field missing. Please check and fill')
+            print(' ')
+            
+            
+            
+        try:
+            st.subheader(f'The estimated rent is around {pred} naira')
+            #st.subheader(selected_values)
+        except (NameError, UnboundLocalError):
+            st.subheader('One or more field missing. Please check and fill')
         
-        st.subheader(f'The estimated rent is around {pred} naira')
-        #st.subheader(selected_values)
     
-    
+
 
 
 
