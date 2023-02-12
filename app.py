@@ -74,6 +74,7 @@ house_type = (
 display_map = {'Newly built':'newly_built_Newly_Built', 'Serviced': 'serviced_Serviced','semi_detached':'semi_detached',
                'luxury':'luxury','pop':'pop', 'wardrobe' : 'wardrobe', 'teraced' : 'teraced', 'detached':'detached',
                'Close to Main  Road' : 'proximity','Furished': 'furnished_Furnished'}
+
 selected_values = list(display_map.values())
 
 
@@ -148,7 +149,7 @@ def show_predict_page():
             
             
         try:
-            st.subheader(f'The estimated rent is around {pred} naira')
+            st.subheader(f'The estimated rent is around {input_data.columns} naira')
             #st.subheader(selected_values)
         except (NameError, UnboundLocalError):
             st.subheader('One or more field missing. Please check and fill')
